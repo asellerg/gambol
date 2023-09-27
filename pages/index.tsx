@@ -7,10 +7,12 @@ import CircularProgress from "@mui/material/CircularProgress";
 import Link from "next/link";
 
 export default function Home() {
-  const [userInput, setUserInput] = useState("");
+  const [userInput, setUserInput] = useState(`hero (Ah Ad), flop (Ks Th 3c) (2 players) SB checks, hero bets one third pot, SB calls turn (4d) SB checks`);
   const [loading, setLoading] = useState(false);
   const [messages, setMessages] = useState([
-    { role: "assistant", content: "Hi there! How can I help?" },
+    { role: "assistant", content: `I am Gambol, an AI coach for 6-max no-limit Texas Hold'em. Feed me a hand history
+    that includes the hero's hole cards, the board, and the post-flop action (like the example below) and I'll tell you the GTO strategy.
+    Keep in mind that, like you, I'm still learning and my advice is for educational purposes only.` },
   ]);
 
   const messageListRef = useRef<HTMLDivElement>(null);
@@ -57,19 +59,30 @@ useEffect(() => {
     const context = [...messages, { role: "user", content: userInput }];
     setMessages(context);
 
-    // Send chat history to API
-    const response = await fetch("/api/chat", {
+    // Fetch strategy
+    let response = await fetch("http://localhost:5000/process", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ messages: context }),
+      body: JSON.stringify({text_input: userInput}),
+    });
+    let data = await response.json();
+    const strategy = data.strategy_str
+
+    // Send chat history to API
+    response = await fetch("/api/chat", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ messages: context, userInput: userInput, strategy: strategy}),
     });
 
     // Reset user input
     setUserInput("");
 
-    const data = await response.json();
+    data = await response.json();
 
     if (!data) {
       handleError();
@@ -97,23 +110,14 @@ useEffect(() => {
   return (
     <>
       <Head>
-        <title>Chat UI</title>
-        <meta name="description" content="OpenAI interface" />
+        <title>Gambol</title>
+        <meta name="description" content="Gambol, an AI coach for no limit Texas Hold'em" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <div className={styles.topnav}>
         <div className={styles.navlogo}>
-          <Link href="/">Chat UI</Link>
-        </div>
-        <div className={styles.navlinks}>
-          <a
-            href="https://platform.openai.com/docs/models/gpt-4"
-            target="_blank"
-          >
-            Docs
-          </a>
-          
+          <Link href="/">Gambol</Link>
         </div>
       </div>
       <main className={styles.main}>
@@ -137,8 +141,8 @@ useEffect(() => {
                   {/* Display the correct icon depending on the message type */}
                   {message.role === "assistant" ? (
                     <Image
-                      src="/openai.png"
-                      alt="AI"
+                      src="/gambol_cute.png"
+                      alt="Gambol"
                       width="30"
                       height="30"
                       className={styles.boticon}
@@ -206,15 +210,6 @@ useEffect(() => {
                 )}
               </button>
             </form>
-          </div>
-          <div className={styles.footer}>
-            <p>
-              Powered by{" "}
-              <a href="https://openai.com/" target="_blank">
-                OpenAI
-              </a>
-              . 
-            </p>
           </div>
         </div>
       </main>

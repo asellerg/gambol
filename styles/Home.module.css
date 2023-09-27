@@ -171,6 +171,10 @@
   display: flex;
 }
 
+.markdownanswer > p {
+  padding-bottom: 1rem;
+}
+
 .markdownanswer {
   line-height: 1.75;
 }
