@@ -56,7 +56,10 @@
 }
 
 .cloudform {
-  position: relative;
+  position: fixed;
+  bottom: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
 }
 
 .textarea {
@@ -82,13 +85,47 @@
 
 .generatebutton {
   position: absolute;
-  top: 0.87rem;
+  top: 1rem;
   right: 1rem;
   color: rgb(165, 162, 162);
   background: none;
   padding: 0.3rem;
   border: none;
   display: flex;
+}
+
+.resetbutton {
+  position: absolute;
+  top: -2.1rem;
+  right: 1rem;
+  color: rgb(165, 162, 162);
+  background: none;
+  padding: 0.3rem;
+  border: none;
+  display: flex;
+}
+
+.resetbuttonicon {
+  display: flex;
+}
+
+.resetbuttontext {
+  display: flex;
+  padding-left: 0.5rem;
+  padding-top: 0.1rem;
+}
+
+.resetbuttonpath {
+  background: none;
+  stroke: none;
+  stroke-width: 1;
+  stroke-dasharray: none;
+  stroke-linecap: butt;
+  stroke-linejoin: miter;
+  stroke-miterlimit: 10;
+  fill: currentColor;
+  fill-rule: nonzero;
+  opacity: 1;
 }
 
 .loadingwheel {
