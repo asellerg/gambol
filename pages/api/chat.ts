@@ -24,8 +24,9 @@ async function chatHandler(
     You know perfect game-theory optimal strategy.`
   ]
   const handHistory = req.body.firstQuestion ? req.body.userInput : req.body.handHistory;
+  const handState = req.body.handState
   instructions.push(
-      `This is a poker hand history: ${handHistory} and these are the GTO strategy percentages: ${req.body.strategy}.
+      `This is a poker hand history: ${handHistory} and the state of the hand is: ${handState}. These are the GTO strategy percentages: ${req.body.strategy}.
       You should first respond with the GTO strategy percentages at the top and explain using poker theory (for example, talking about the opponents' likely ranges) why this is the GTO strategy.
       Then answer any follow-up questions the user might have.`
   )
