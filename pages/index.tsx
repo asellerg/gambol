@@ -90,6 +90,7 @@ useEffect(() => {
     let data: JSONObject;
     let strategy;
     let handState;
+    let prob;
     let firstQuestion = true;
     // Fetch strategy if this is a new hand.
     if (!infoSet) {
@@ -103,6 +104,7 @@ useEffect(() => {
       data = await response.json();
       strategy = data.strategy_str;
       handState = data.hand_state_str;
+      prob = data.prob;
       firstQuestion = true;
       setInfoSet(data.info_set);
       setHandHistory(userInput);
@@ -116,7 +118,7 @@ useEffect(() => {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ messages: context, userInput: userInput, strategy: strategy, handHistory: handHistory, firstQuestion: firstQuestion, handState: handState}),
+      body: JSON.stringify({ messages: context, userInput: userInput, strategy: strategy, handHistory: handHistory, firstQuestion: firstQuestion, handState: handState, prob: prob}),
     });
 
     // Reset user input

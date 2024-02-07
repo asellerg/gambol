@@ -21,12 +21,14 @@ async function chatHandler(
   let instructions = [
     `Your name is Gambol.
     You are an expert at Texas Hold'em poker specifically the version called 6max.
-    You know perfect game-theory optimal strategy.`
+    You know perfect game-theory optimal strategy.
+    If the probability of a hand history is less than 0.005, then warn the user that the previous actions have deviated from GTO and your results may not be very accurate.`
   ]
   const handHistory = req.body.firstQuestion ? req.body.userInput : req.body.handHistory;
-  const handState = req.body.handState
+  const handState = req.body.handState;
+  const prob = req.body.prob;
   instructions.push(
-      `This is a poker hand history: ${handHistory} and the state of the hand is: ${handState}. These are the GTO strategy percentages: ${req.body.strategy}.
+      `This is a poker hand history: ${handHistory} and the state of the hand is: ${handState}. The probability of this hand history is ${prob}. These are the GTO strategy percentages: ${req.body.strategy}.
       You should first respond with the GTO strategy percentages at the top and explain using poker theory (for example, talking about the opponents' likely ranges) why this is the GTO strategy.
       Then answer any follow-up questions the user might have.`
   )
