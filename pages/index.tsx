@@ -5,6 +5,7 @@ import Image from "next/image";
 import ReactMarkdown from "react-markdown";
 import CircularProgress from "@mui/material/CircularProgress";
 import Link from "next/link";
+import { GoogleTagManager } from '@next/third-parties/google'
 
 type JSONValue =
     | string
@@ -20,7 +21,7 @@ interface JSONObject {
 interface JSONArray extends Array<JSONValue> { }
 
 export default function Home() {
-  const [userInput, setUserInput] = useState(`hero (Ah Ad), preflop UTG folds, MP folds, CO folds, hero bets pot, SB raises pot, BB folds, hero calls flop (Ks Th 3c) (2 players) SB checks`);
+  const [userInput, setUserInput] = useState(`I have (Kd Kh) in the SB, everyone folds to the BTN who bets $6, I raise to $15 BB folds, BTN calls flop comes (Ks Th 3c) ($33) I bet $11, BTN calls turn (4d) ($55) I check, BTN bets $40`);
   const WELCOME_MESSAGE = [
     { role: "assistant", content: `I am Gambol, an AI coach for 6-max no-limit Texas Hold'em. Feed me a hand history
     that includes the hero's hole cards, the board, and the action (like the example below) and I'll tell you the GTO strategy. Keep in mind that, like you, I'm still learning and my advice is for educational purposes only.`}
@@ -56,7 +57,7 @@ useEffect(() => {
       ...prevMessages,
       {
         role: "assistant",
-        content: "Oops! There seems to be an error. Please try again.",
+        content: "No GTO strategy was found, please try rewording the hand history.",
       },
     ]);
     setLoading(false);
@@ -93,7 +94,7 @@ useEffect(() => {
     let prob;
     let firstQuestion = true;
     // Fetch strategy if this is a new hand.
-    if (!infoSet) {
+    if (!strategy) {
       response = await fetch(backendUrl, {
         method: "POST",
         headers: {
@@ -102,6 +103,10 @@ useEffect(() => {
         body: JSON.stringify({text_input: userInput}),
       });
       data = await response.json();
+      if (!data.strategy_str) {
+        handleError();
+        return;
+      }
       strategy = data.strategy_str;
       handState = data.hand_state_str;
       prob = data.prob;
@@ -158,6 +163,7 @@ useEffect(() => {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
+      <GoogleTagManager gtmId="G-X5YN08W9GG" />
       <div className={styles.topnav}>
         <div className={styles.navlogo}>
           <Link href="/">Gambol</Link>
