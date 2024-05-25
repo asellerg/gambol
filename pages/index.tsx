@@ -21,7 +21,7 @@ interface JSONObject {
 interface JSONArray extends Array<JSONValue> { }
 
 export default function Home() {
-  const [userInput, setUserInput] = useState(`I have (Kd Kh) in the SB, everyone folds to the BTN who bets $6, I raise to $15 BB folds, BTN calls flop comes (Ks Th 3c) ($33) I bet $11, BTN calls turn (4d) ($55) I check, BTN bets $40`);
+  const [userInput, setUserInput] = useState(`I have (Kd Kh) in the SB, UTG folds, MP folds, CO folds, BTN bets $6, I raise to $15, BB folds, BTN calls flop comes (Ks Th 3c) ($33) I bet $11, BTN calls turn (4d) ($55) I check, BTN bets $40`);
   const WELCOME_MESSAGE = [
     { role: "assistant", content: `I am Gambol, an AI coach for 6-max no-limit Texas Hold'em. Feed me a hand history
     that includes the hero's hole cards, the board, and the action (like the example below) and I'll tell you the GTO strategy. Keep in mind that, like you, I'm still learning and my advice is for educational purposes only.`}
