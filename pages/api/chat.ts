@@ -1,18 +1,13 @@
-// Make sure to add OPENAI_API_KEY as a secret
+// Make sure to add GEMINI_API_KEY as a secret
 
-import {
-  Configuration,
-  OpenAIApi,
-  ChatCompletionRequestMessage,
-  ChatCompletionRequestMessageRoleEnum,} from "openai";
+const { GoogleGenerativeAI } = require("@google/generative-ai");
+
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+
+const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro-latest"});
+
 import type { NextApiRequest, NextApiResponse } from "next";
 
-
-const configuration = new Configuration({
-  apiKey: process.env.OPENAI_API_KEY,
-});
-
-const openai = new OpenAIApi(configuration);
 
 async function chatHandler(
   req: NextApiRequest,
@@ -30,27 +25,23 @@ async function chatHandler(
   const handHistory = req.body.firstQuestion ? req.body.userInput : req.body.handHistory;
   const handState = req.body.handState;
   const prob = req.body.prob;
-  instructions.push(
-      `This is a poker hand history: ${handHistory} and the state of the hand is: ${handState}. The probability of this hand history is ${prob}. These are the GTO strategy percentages: ${req.body.strategy}.
-      You should first respond with the GTO strategy percentages at the top and explain using poker theory (for example, talking about the opponents' likely ranges) why this is the GTO strategy.
-      Then answer any follow-up questions the user might have.`
-  )
-  let messages: Array<ChatCompletionRequestMessage> = instructions.map(i => ({
-    role: ChatCompletionRequestMessageRoleEnum.System,
-    content: i,
-  }));
+  let message = `This is a poker hand history: ${handHistory} and the state of the hand is: ${handState}. The probability of this hand history is ${prob}. These are the GTO strategy percentages: ${req.body.strategy}.`;
   if (!req.body.firstQuestion) {
-    messages.push({
-      role: ChatCompletionRequestMessageRoleEnum.User,
-      content: req.body.userInput,
-    });
+    instructions.push(message);
+    message = req.body.userInput;
+  } else {
+    instructions.push(`Unless you're answering a follow-up question, you should first respond with the GTO strategy percentages at the top and explain using poker theory (for example, talking about the opponents' likely ranges) why this is the GTO strategy.`);
   }
-  const completion = await openai.createChatCompletion({
-    model: "gpt-4",
-    messages: messages,
-    temperature: 0,
+  let messages = instructions.map(i => ({
+    role: "user",
+    parts: [{ text: i }],
+  }));
+  const chat = model.startChat({
+    history: messages
   });
-  res.status(200).json({ result: completion.data.choices[0].message });
+  const result = await chat.sendMessage(message);
+  const response = await result.response;
+  res.status(200).json({ result: response.text() });
 }
 
 export default chatHandler;

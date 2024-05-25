@@ -29,7 +29,11 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [messages, setMessages] = useState(WELCOME_MESSAGE);
   const [infoSet, setInfoSet] = useState(`` as JSONValue);
+  const [firstQuestion, setFirstQuestion] = useState(true);
   const [handHistory, setHandHistory] = useState(``);
+  const [strategy, setStrategy] = useState(``);
+  const [handState, setHandState] = useState(``);
+  const [prob, setProb] = useState(0.0);
   const backendUrl = process.env.NODE_ENV === 'development' ? 'http://localhost:5000/process' : 'https://backend.gambol.ai/process';
 
   const messageListRef = useRef<HTMLDivElement>(null);
@@ -88,11 +92,7 @@ useEffect(() => {
     setMessages(context);
 
     let response;
-    let data: JSONObject;
-    let strategy;
-    let handState;
-    let prob;
-    let firstQuestion = true;
+    let data: JSONObject = {'strategy_str': '', 'hand_state_str': '', prob: 0.0, info_set: ''};
     // Fetch strategy if this is a new hand.
     if (!strategy) {
       response = await fetch(backendUrl, {
@@ -107,14 +107,14 @@ useEffect(() => {
         handleError();
         return;
       }
-      strategy = data.strategy_str;
-      handState = data.hand_state_str;
-      prob = data.prob;
-      firstQuestion = true;
-      setInfoSet(data.info_set);
+      setStrategy(data.strategy_str as string);
+      setHandState(data.hand_state_str as string);
+      setProb(data.prob as number);
+      setFirstQuestion(true);
+      setInfoSet(data.info_set as string);
       setHandHistory(userInput);
     } else {
-      firstQuestion = false;
+      setFirstQuestion(false);
     }
 
     // Send chat history to API
@@ -123,7 +123,7 @@ useEffect(() => {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ messages: context, userInput: userInput, strategy: strategy, handHistory: handHistory, firstQuestion: firstQuestion, handState: handState, prob: prob}),
+      body: JSON.stringify({ messages: context, userInput: userInput, strategy: strategy || data.strategy_str, handHistory: handHistory, firstQuestion: firstQuestion, handState: handState || data.hand_state_str, prob: prob || data.prob}),
     });
 
     // Reset user input
@@ -136,10 +136,10 @@ useEffect(() => {
       return;
     }
 
-    const result: JSONObject = data.result as JSONObject;
+    const result: string = data.result as string;
     setMessages((prevMessages) => [
       ...prevMessages,
-      { role: "assistant", content: result.content as string},
+      { role: "assistant", content: result},
     ]);
     setLoading(false);
   };
