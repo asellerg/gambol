@@ -80,6 +80,7 @@ useEffect(() => {
       setInfoSet("");
       setMessages(WELCOME_MESSAGE);
       setLoading(false);
+      setFirstQuestion(true);
       return;
     }
 

@@ -4,6 +4,12 @@ const { GoogleGenerativeAI } = require("@google/generative-ai");
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
+const generationConfig = {
+  temperature: 0.,
+  topP: 0.95,
+  topK: 64,
+};
+
 const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro-latest"});
 
 import type { NextApiRequest, NextApiResponse } from "next";
@@ -37,7 +43,8 @@ async function chatHandler(
     parts: [{ text: i }],
   }));
   const chat = model.startChat({
-    history: messages
+    history: messages,
+    generationConfig: generationConfig
   });
   const result = await chat.sendMessage(message);
   const response = await result.response;
