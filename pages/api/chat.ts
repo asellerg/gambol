@@ -1,6 +1,6 @@
 // Make sure to add GEMINI_API_KEY as a secret
 
-const { GoogleGenerativeAI } = require("@google/generative-ai");
+const { HarmCategory, HarmBlockThreshold, GoogleGenerativeAI } = require("@google/generative-ai");
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
@@ -9,6 +9,25 @@ const generationConfig = {
   topP: 0.95,
   topK: 64,
 };
+
+const safetySettings = [
+  {
+    category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
+    threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH
+  },
+  {
+    category: HarmCategory.HARM_CATEGORY_HARASSMENT,
+    threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH
+  },
+  {
+    category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+    threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH
+  },
+  {
+    category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+    threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH
+  },
+];
 
 const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro-latest"});
 
@@ -44,7 +63,8 @@ async function chatHandler(
   }));
   const chat = model.startChat({
     history: messages,
-    generationConfig: generationConfig
+    generationConfig: generationConfig,
+    safetySettings: safetySettings
   });
   const result = await chat.sendMessage(message);
   const response = await result.response;

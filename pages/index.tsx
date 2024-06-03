@@ -23,8 +23,10 @@ interface JSONArray extends Array<JSONValue> { }
 export default function Home() {
   const [userInput, setUserInput] = useState(`I have (Ad Qh) in the SB, UTG folds, MP folds, CO folds, BTN bets $6, I raise to $15, BB folds, BTN calls flop comes (Ks Th 3c) ($33)`);
   const WELCOME_MESSAGE = [
-    { role: "assistant", content: `I am Gambol, an AI coach for 6-max no-limit Texas Hold'em. Feed me a hand history
-    that includes the hero's hole cards, the board, and the action (like the example below) and I'll tell you the GTO strategy. Keep in mind that, like you, I'm still learning and my advice is for educational purposes only.`}
+    { role: "assistant", content: `I am Gambol, an AI coach for 6-max no-limit Texas Hold'em.
+Feed me a hand history that includes the hero's hole cards, the board, and the action (like the example below) and I'll tell you the GTO strategy.
+I only know how to play against one player post-flop right now, but stay tuned, I'm a fast learner!
+Keep in mind that my advice may not be perfect and is for educational purposes only.`}
   ]
   const [loading, setLoading] = useState(false);
   const [messages, setMessages] = useState(WELCOME_MESSAGE);
