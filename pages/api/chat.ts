@@ -50,7 +50,14 @@ async function chatHandler(
   const handHistory = req.body.firstQuestion ? req.body.userInput : req.body.handHistory;
   const handState = req.body.handState;
   const prob = req.body.prob;
-  let message = `This is a poker hand history: ${handHistory}. The user's hand and outs are: ${handState.split('.')[0]}. Remember that 4 outs to a straight is NOT an open-ended straight draw, it's a gutshot straight draw. The board indicates that, based on the board, another player (someone): ${handState.split('.')[1]}The probability of this hand history is ${prob}. These are the GTO strategy percentages: ${req.body.strategy}.`;
+  let message = `This is a poker hand history: ${handHistory}.
+  The user's hand and outs are: ${handState.split('.')[0]}.
+  Remember that 4 outs to a straight is NOT an open-ended straight draw, it's a gutshot straight draw.
+  DO NOT try to name the cards that are the user's outs.
+  DO NOT name the suits that would make a flush.
+  The board indicates that, based on the board, another player (someone): ${handState.split('.')[1]}
+  The probability of this hand history is ${prob}.
+  These are the GTO strategy percentages: ${req.body.strategy}.`;
   if (!req.body.firstQuestion) {
     instructions.push(message);
     message = req.body.userInput;
