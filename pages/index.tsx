@@ -91,14 +91,9 @@ useEffect(() => {
 
     let handHistory = '';
     let response;
+    let random = false;
     if (submitter == 'random') {
       setUserInput("");
-      setInfoSet("");
-      setProb(0.);
-      setStrategy("");
-      setHandState("");
-      setMessages(WELCOME_MESSAGE);
-      setFirstQuestion(true);
       response = await fetch(backendUrl + '/random', {
         method: "POST",
         headers: {
@@ -108,6 +103,7 @@ useEffect(() => {
       });
       let data = await response.json();
       handHistory = data.hand_history;
+      random = true;
     } else {
       handHistory = userInput;
     }
@@ -122,7 +118,7 @@ useEffect(() => {
 
     let strategyData: JSONObject = {'strategy_str': '', 'hand_state_str': '', prob: 0.0, info_set: ''};
     // Fetch strategy if this is a new hand.
-    if (!strategy) {
+    if (!strategy || random) {
       response = await fetch(backendUrl + '/process', {
         method: "POST",
         headers: {
@@ -151,7 +147,7 @@ useEffect(() => {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ messages: context, userInput: handHistory, strategy: strategy || strategyData.strategy_str, handHistory: handHistory, firstQuestion: firstQuestion, handState: handState || strategyData.hand_state_str, prob: prob || strategyData.prob}),
+      body: JSON.stringify({ messages: context, userInput: handHistory, strategy: strategyData.strategy_str || strategy, handHistory: handHistory, firstQuestion: firstQuestion, handState: strategyData.hand_state_str || handState, prob: strategyData.prob || prob}),
     });
 
     // Reset user input
@@ -170,6 +166,7 @@ useEffect(() => {
       { role: "assistant", content: result},
     ]);
     setLoading(false);
+    setFirstQuestion(false);
   };
 
   // Prevent blank submissions and allow for multiline input
