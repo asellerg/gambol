@@ -36,7 +36,7 @@ Keep in mind that my advice may not be perfect and is for educational purposes o
   const [strategy, setStrategy] = useState(``);
   const [handState, setHandState] = useState(``);
   const [prob, setProb] = useState(0.0);
-  const backendUrl = process.env.NODE_ENV === 'development' ? 'http://localhost:5000/process' : 'https://backend.gambol.ai/process';
+  const backendUrl = process.env.NODE_ENV === 'development' ? 'http://localhost:5000' : 'https://backend.gambol.ai';
 
   const messageListRef = useRef<HTMLDivElement>(null);
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
@@ -80,42 +80,67 @@ useEffect(() => {
     if (submitter == 'reset') {
       setUserInput("");
       setInfoSet("");
+      setProb(0.);
+      setStrategy("");
+      setHandState("");
       setMessages(WELCOME_MESSAGE);
       setLoading(false);
       setFirstQuestion(true);
       return;
     }
 
-    if (userInput.trim() === "") {
-      return;
-    }
-
-    setLoading(true);
-    const context = [...messages, { role: "user", content: userInput }];
-    setMessages(context);
-
+    let handHistory = '';
     let response;
-    let data: JSONObject = {'strategy_str': '', 'hand_state_str': '', prob: 0.0, info_set: ''};
-    // Fetch strategy if this is a new hand.
-    if (!strategy) {
-      response = await fetch(backendUrl, {
+    if (submitter == 'random') {
+      setUserInput("");
+      setInfoSet("");
+      setProb(0.);
+      setStrategy("");
+      setHandState("");
+      setMessages(WELCOME_MESSAGE);
+      setFirstQuestion(true);
+      response = await fetch(backendUrl + '/random', {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({text_input: userInput}),
+        body: JSON.stringify({}),
       });
-      data = await response.json();
-      if (!data.strategy_str) {
+      let data = await response.json();
+      handHistory = data.hand_history;
+    } else {
+      handHistory = userInput;
+    }
+
+    if (userInput.trim() === "" && !handHistory) {
+      return;
+    }
+
+    const context = [...messages, { role: "user", content: handHistory }];
+    setMessages(context);
+    setLoading(true);
+
+    let strategyData: JSONObject = {'strategy_str': '', 'hand_state_str': '', prob: 0.0, info_set: ''};
+    // Fetch strategy if this is a new hand.
+    if (!strategy) {
+      response = await fetch(backendUrl + '/process', {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({text_input: handHistory}),
+      });
+      strategyData = await response.json();
+      if (!strategyData.strategy_str) {
         handleError();
         return;
       }
-      setStrategy(data.strategy_str as string);
-      setHandState(data.hand_state_str as string);
-      setProb(data.prob as number);
+      setStrategy(strategyData.strategy_str as string);
+      setHandState(strategyData.hand_state_str as string);
+      setProb(strategyData.prob as number);
       setFirstQuestion(true);
-      setInfoSet(data.info_set as string);
-      setHandHistory(userInput);
+      setInfoSet(strategyData.info_set as string);
+      setHandHistory(handHistory);
     } else {
       setFirstQuestion(false);
     }
@@ -126,13 +151,13 @@ useEffect(() => {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ messages: context, userInput: userInput, strategy: strategy || data.strategy_str, handHistory: handHistory, firstQuestion: firstQuestion, handState: handState || data.hand_state_str, prob: prob || data.prob}),
+      body: JSON.stringify({ messages: context, userInput: handHistory, strategy: strategy || strategyData.strategy_str, handHistory: handHistory, firstQuestion: firstQuestion, handState: handState || strategyData.hand_state_str, prob: prob || strategyData.prob}),
     });
 
     // Reset user input
     setUserInput("");
 
-    data = await response.json();
+    let data = await response.json();
 
     if (!data) {
       handleError();
@@ -224,6 +249,23 @@ useEffect(() => {
         <div className={styles.center}>
           <div className={styles.cloudform}>
             <form onSubmit={handleSubmit}>
+              <button
+                type="submit"
+                disabled={loading}
+                className={styles.randombutton}
+                name="action"
+                value="random"
+              >
+                <Image
+                  src="/dice.png"
+                  alt="Random"
+                  width="20"
+                  height="20"
+                  className={styles.randombuttonicon}
+                  priority={true}
+                />
+                <span className={styles.randombuttontext} >Random</span>
+              </button>              
               <button
                 type="submit"
                 disabled={loading}

@@ -94,6 +94,40 @@
   display: flex;
 }
 
+.randombutton {
+  position: absolute;
+  top: -2.1rem;
+  right: 7.2rem;
+  color: rgb(165, 162, 162);
+  background: none;
+  padding: 0.4rem;
+  border: none;
+  display: flex;
+}
+
+.randombuttonicon {
+  display: flex;
+}
+
+.randombuttontext {
+  display: flex;
+  padding-left: 0.5rem;
+  padding-top: 0.1rem;
+}
+
+.randombuttonpath {
+  background: none;
+  stroke: none;
+  stroke-width: 1;
+  stroke-dasharray: none;
+  stroke-linecap: butt;
+  stroke-linejoin: miter;
+  stroke-miterlimit: 10;
+  fill: currentColor;
+  fill-rule: nonzero;
+  opacity: 1;
+}
+
 .resetbutton {
   position: absolute;
   top: -2.1rem;
