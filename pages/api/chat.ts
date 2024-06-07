@@ -55,7 +55,6 @@ async function chatHandler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  let messages = [];
   let messages = [{
     role: "user",
     parts: [{ text: `This is a poker hand history: hero (Qs Qd), preflop UTG bets $52.98, MP folds, CO folds, BTN folds, SB raises $165.46, BB folds, UTG calls flop 6s 3c Td ($492.28): SB checks
