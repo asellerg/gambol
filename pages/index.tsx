@@ -35,6 +35,7 @@ Keep in mind that my advice may not be perfect and is for educational purposes o
   const [handHistory, setHandHistory] = useState(``);
   const [strategy, setStrategy] = useState(``);
   const [handState, setHandState] = useState(``);
+  const [positionState, setPositionState] = useState(``);
   const [prob, setProb] = useState(0.0);
   const backendUrl = process.env.NODE_ENV === 'development' ? 'http://localhost:5000' : 'https://backend.gambol.ai';
 
@@ -83,6 +84,7 @@ useEffect(() => {
       setProb(0.);
       setStrategy("");
       setHandState("");
+      setPositionState("");
       setMessages(WELCOME_MESSAGE);
       setLoading(false);
       setFirstQuestion(true);
@@ -116,7 +118,7 @@ useEffect(() => {
     setMessages(context);
     setLoading(true);
 
-    let strategyData: JSONObject = {'strategy_str': '', 'hand_state_str': '', prob: 0.0, info_set: ''};
+    let strategyData: JSONObject = {strategy_str: '', hand_state_str: '', prob: 0.0, info_set: '', position_str: ''};
     // Fetch strategy if this is a new hand.
     if (!strategy || random) {
       response = await fetch(backendUrl + '/process', {
@@ -137,6 +139,7 @@ useEffect(() => {
       setFirstQuestion(true);
       setInfoSet(strategyData.info_set as string);
       setHandHistory(handHistory);
+      setPositionState(strategyData.position_str as string);
     } else {
       setFirstQuestion(false);
     }
@@ -147,7 +150,7 @@ useEffect(() => {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ messages: context, userInput: handHistory, strategy: strategyData.strategy_str || strategy, handHistory: handHistory, firstQuestion: firstQuestion, handState: strategyData.hand_state_str || handState, prob: strategyData.prob || prob}),
+      body: JSON.stringify({ messages: context, userInput: handHistory, strategy: strategyData.strategy_str || strategy, handHistory: handHistory, firstQuestion: firstQuestion, handState: strategyData.hand_state_str || handState, prob: strategyData.prob || prob, positionStr: strategyData.position_str || positionState}),
     });
 
     // Reset user input
